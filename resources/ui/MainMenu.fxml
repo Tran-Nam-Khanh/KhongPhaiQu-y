@@ -15,12 +15,12 @@
             <Image url="@../images/background/Menu.png" />
          </image>
       </ImageView>
-      <Button fx:id="startButton" layoutX="370.0" layoutY="308.0" mnemonicParsing="false" onAction="#handleStartButtonAction" prefHeight="100.0" prefWidth="400.0" text="Start" textAlignment="CENTER" textFill="#38cf43">
+      <Button fx:id="startButton" layoutX="423.0" layoutY="308.0" mnemonicParsing="false" onAction="#handleStartButtonAction" prefHeight="100.0" prefWidth="400.0" text="Start" textAlignment="CENTER" textFill="#38cf43">
          <font>
             <Font size="49.0" />
          </font>
       </Button>
-      <Button fx:id="exitButton" layoutX="370.0" layoutY="512.0" mnemonicParsing="false" onAction="#handleExitButtonAction" prefHeight="100.0" prefWidth="400.0" text="Exit" textAlignment="CENTER" textFill="#38cf43">
+      <Button fx:id="exitButton" layoutX="423.0" layoutY="511.0" mnemonicParsing="false" onAction="#handleExitButtonAction" prefHeight="100.0" prefWidth="400.0" text="Exit" textAlignment="CENTER" textFill="#38cf43">
          <font>
             <Font size="49.0" />
          </font>
@@ -28,7 +28,7 @@
             <Cursor fx:constant="DEFAULT" />
          </cursor>
       </Button>
-      <Label layoutX="327.0" layoutY="85.0" prefHeight="66.0" prefWidth="468.0" text="ARKANOID" textAlignment="CENTER" textFill="#c70606" wrapText="true">
+      <Label layoutX="406.0" layoutY="84.0" prefHeight="66.0" prefWidth="468.0" text="ARKANOID" textAlignment="CENTER" textFill="#c70606" wrapText="true">
          <font>
             <Font name="System Bold Italic" size="85.0" />
          </font>

@@ -14,17 +14,17 @@
             <Image url="@../images/background/Wingame.png" />
          </image>
       </ImageView>
-      <Label layoutX="512.0" layoutY="129.0" prefHeight="62.0" prefWidth="406.0" text="YOU WIN !" textFill="#e46565">
+      <Label layoutX="450.0" layoutY="131.0" prefHeight="142.0" prefWidth="478.0" text="YOU WIN !" textFill="#e46565">
          <font>
-            <Font size="83.0" />
+            <Font size="96.0" />
          </font>
       </Label>
-      <Button fx:id="playAgainButton" layoutX="646.0" layoutY="286.0" mnemonicParsing="false" onAction="#handlePlayAgainAction" prefHeight="82.0" prefWidth="173.0" text="AGAIN">
+      <Button fx:id="playAgainButton" layoutX="602.0" layoutY="291.0" mnemonicParsing="false" onAction="#handlePlayAgainAction" prefHeight="82.0" prefWidth="173.0" text="AGAIN">
          <font>
             <Font size="38.0" />
          </font>
       </Button>
-      <Button fx:id="mainMenuButton" layoutX="645.0" layoutY="443.0" mnemonicParsing="false" onAction="#handleMainMenuAction" prefHeight="26.0" prefWidth="174.0" text="MENU">
+      <Button fx:id="mainMenuButton" layoutX="601.0" layoutY="443.0" mnemonicParsing="false" onAction="#handleMainMenuAction" prefHeight="26.0" prefWidth="174.0" text="MENU">
          <font>
             <Font size="38.0" />
          </font>
