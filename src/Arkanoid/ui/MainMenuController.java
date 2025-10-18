@@ -23,4 +23,11 @@ public class MainMenuController {
         System.out.println("Nút Thoát đã được nhấn! Đang đóng ứng dụng...");
         Platform.exit();
     }
+    @FXML
+    public void initialize() {
+        // Áp dụng hiệu ứng fade-in cho các nút khi menu vừa mở lên
+        // Nút sẽ hiện ra trong 1 giây (1000 mili giây)
+        AnimationHelper.applyFadeIn(startButton, 3000);
+        AnimationHelper.applyFadeIn(exitButton, 3000);
+    }
 }
