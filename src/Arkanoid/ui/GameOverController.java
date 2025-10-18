@@ -18,6 +18,11 @@ public class GameOverController {
     void handlePlayAgainAction(ActionEvent event) {
         System.out.println("Nút Chơi Lại (Game Over) đã được nhấn!");
     }
+    @FXML
+    public void initialize() {
+        AnimationHelper.applyFadeIn(playAgainButton, 3000);
+        AnimationHelper.applyFadeIn(mainMenuButton, 3000);
+    }
 
     @FXML
     void handleMainMenuAction(ActionEvent event) {

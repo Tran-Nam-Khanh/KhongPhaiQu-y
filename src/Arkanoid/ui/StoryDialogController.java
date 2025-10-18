@@ -49,7 +49,10 @@ public class StoryDialogController {
         choicesBox.setVisible(true);
     }
 
-
+    public void initialize() {
+        AnimationHelper.applyFadeIn(continueButton, 2000);
+        AnimationHelper.applyFadeIn(choicesBox, 2000);
+    }
     @FXML
     void handleContinueAction(ActionEvent event) {
         System.out.println("Người dùng nhấn 'Tiếp Tục'.");
