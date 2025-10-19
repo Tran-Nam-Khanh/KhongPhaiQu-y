@@ -2,15 +2,14 @@ package application;
 
 import gameobject.*; // @TODO: Import các lớp đối tượng game của Khánh
 import javafx.animation.AnimationTimer;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
-import level.LevelManager; // Import LevelManager của bạn
-import utils.BackgroundManager; // Import BackgroundManager của bạn
-
+import level.LevelManager;
+import ui.GameUIController; // Import controller của Huy
+import utils.BackgroundManager;
+import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +19,11 @@ public class GameManager {
     private GraphicsContext gc;
     private AnimationTimer gameLoop;
 
-    // Quản lý các thành phần khác
+    // Các thành phần quản lý
     private LevelManager levelManager;
     private SoundManager soundManager;
     private BackgroundManager backgroundManager;
+    private GameUIController gameUIController; // Tham chiếu tới controller của Huy
 
     // Trạng thái game
     private int currentLevel;
@@ -33,37 +33,36 @@ public class GameManager {
 
     // Danh sách các đối tượng trong game
     // @TODO: Sử dụng các lớp đối tượng do Khánh code
-    // private Paddle paddle;
-    // private List<Ball> balls;
-    // private List<Brick> bricks;
-    // private List<PowerUp> powerUps;
+    private Paddle paddle;
+    private List<Ball> balls = new ArrayList<>();
+    private List<Brick> bricks = new ArrayList<>();
 
-    public GameManager(Stage stage) {
+    public GameManager(Stage stage, GraphicsContext gc, GameUIController gameUIController) {
         this.stage = stage;
+        this.gc = gc;
+        this.gameUIController = gameUIController;
+
         this.levelManager = new LevelManager();
         this.soundManager = new SoundManager();
         this.backgroundManager = new BackgroundManager();
     }
 
-    public void startGame() {
-        // Thiết lập màn hình game
-        Canvas canvas = new Canvas(Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
-        gc = canvas.getGraphicsContext2D();
-        Group root = new Group(canvas);
-        Scene gameScene = new Scene(root);
-
-        stage.setScene(gameScene);
-
-        // Khởi tạo trạng thái game
+    /**
+     * bắt đầu trò chơi
+     */
+    public void startGame(Scene scene) {
         currentLevel = 1;
         score = 0;
         lives = Config.INITIAL_LIVES;
         isRunning = true;
 
-        // Tải màn chơi đầu tiên
-        loadLevel(currentLevel);
+        // Cập nhật giao diện của Huy
+        gameUIController.updateLevel(currentLevel);
+        gameUIController.updateLives(lives);
 
-        // Khởi tạo game loop
+        loadLevel(currentLevel);
+        handleKeyPress(scene);
+
         gameLoop = new AnimationTimer() {
             private long lastUpdate = 0;
             @Override
@@ -78,65 +77,174 @@ public class GameManager {
         gameLoop.start();
         soundManager.playBackgroundMusic();
     }
+    /**
+     * Điều khiển thay đổi khi nhấn các nút trên bàn phims
+     */
+    private void handleKeyPress(Scene scene) {
+        scene.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case LEFT:
+                    paddle.moveLeft();
+                    break;
+                case RIGHT:
+                    paddle.moveRight();
+                    break;
+                default:
+                    break;
+            }
+        });
 
-    private void loadLevel(int levelNumber) {
-        // @TODO: Sử dụng LevelManager để lấy danh sách gạch cho màn chơi
-        // bricks = levelManager.loadLevel(levelNumber);
-        // Khởi tạo paddle, ball tại đây
+        scene.setOnKeyReleased(event -> {
+            switch (event.getCode()) {
+                case LEFT:
+                case RIGHT:
+                    paddle.stop();
+                    break;
+                default:
+                    break;
+            }
+        });
     }
+    /**
+     * hàm hiển thị khi bắt đầu một màn mới
+     */
+    private void loadLevel(int levelNumber) {
 
-    // Vòng lặp cập nhật logic game
+        bricks = LevelManager.loadLevel(levelNumber);
+
+        double paddleStartX = (Config.SCREEN_WIDTH - Config.PADDLE_WIDTH) / 2;
+        paddle = new Paddle(paddleStartX, Config.PADDLE_Y_POSITION, Config.PADDLE_WIDTH, Config.PADDLE_HEIGHT);
+
+        balls.clear();
+        double ballStartX = paddle.getX() + (paddle.getWidth() / 2);
+        double ballStartY = paddle.getY() - Config.BALL_RADIUS;
+        balls.add(new Ball(ballStartX, ballStartY, Config.BALL_RADIUS));
+
+        gameUIController.updateLevel(levelNumber);
+    }
+    /**
+     * Ham cap nhat trang thai khi choi game
+     */
     private void update() {
         if (!isRunning) return;
 
-        // @TODO:
-        // 1. Cập nhật vị trí bóng (balls)
-        // 2. Cập nhật vị trí vật phẩm (powerUps)
-        // 3. Xử lý va chạm (dùng CollisionDetector của Khánh)
-        //    - Bóng với tường
-        //    - Bóng với paddle
-        //    - Bóng với gạch
-        //    - Paddle với vật phẩm
-        // 4. Kiểm tra điều kiện thắng/thua
-        //    - Nếu hết gạch -> thắng màn -> nextLevel()
-        //    - Nếu bóng rơi xuống dưới -> mất mạng -> resetBall() hoặc gameOver()
-    }
+        paddle.update();
+        for (Ball ball : balls) {
+            ball.update();
+        }
 
-    // Vòng lặp vẽ lại các đối tượng
+        java.util.Iterator<Ball> ballIterator = balls.iterator();
+        while (ballIterator.hasNext()) {
+            Ball ball = ballIterator.next();
+            if (CollisionDetector.checkCollision(ball, paddle)) {
+                ball.reverseY();
+                soundManager.playSoundEffect("paddle_hit.wav");
+            }
+            java.util.Iterator<Brick> brickIterator = bricks.iterator();
+            while (brickIterator.hasNext()) {
+                Brick brick = brickIterator.next();
+                if (CollisionDetector.checkCollision(ball, brick)) {
+
+                    double overlapX = (ball.getWidth() / 2 + brick.getWidth() / 2) - Math.abs(ball.getCenterX() - brick.getCenterX());
+                    double overlapY = (ball.getHeight() / 2 + brick.getHeight() / 2) - Math.abs(ball.getCenterY() - brick.getCenterY());
+
+                    if (overlapX < overlapY) {
+                        ball.reverseX();
+                    } else {
+                        ball.reverseY();
+                    }
+                    brick.takeDamage();
+                    if (brick.isDestroyed()) {
+                        brickIterator.remove();
+                        score += 10;
+                        gameUIController.updateScore(score);
+                    }
+                    soundManager.playSoundEffect("brick_hit.wav");
+                    break;
+                }
+            }
+            if (ball.getY() > Config.SCREEN_HEIGHT) {
+                ballIterator.remove();
+            }
+        }
+        if (balls.isEmpty()) {
+            loseLife();
+        }
+        if (bricks.isEmpty()) {
+            nextLevel();
+        }
+    }
+    /**
+     * Ham in man hinh
+     */
     private void render() {
-        // 1. Vẽ nền
+        gc.clearRect(0, 0, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
+
         gc.drawImage(backgroundManager.getBackground(currentLevel), 0, 0);
 
-        // 2. Vẽ các đối tượng game
-        // @TODO: Dùng gc.drawImage() hoặc gc.fillRect() để vẽ paddle, ball, bricks, powerups
-        // paddle.render(gc);
-        // for (Ball ball : balls) ball.render(gc);
-        // for (Brick brick : bricks) brick.render(gc);
+        if (paddle != null) {
+            paddle.render(gc);
+        }
 
-        // 3. Vẽ thông tin UI (Điểm, Mạng)
-        gc.setFill(Color.WHITE);
-        gc.fillText("Score: " + score, 20, 30);
-        gc.fillText("Lives: " + lives, Config.SCREEN_WIDTH - 80, 30);
+        for (Brick brick : bricks) {
+            brick.render(gc);
+        }
+
+        for (Ball ball : balls) {
+            ball.render(gc);
+        }
+
+        for (PowerUp powerUp : powerUps) {
+             powerUp.render(gc);
+        }
+    }
+    /**
+     * Ham tru mang neu du dieu kien
+     */
+    private void loseLife() {
+        lives--;
+        soundManager.playSoundEffect("lose_life.wav");
+        gameUIController.updateLives(lives);
+        if (lives <= 0) {
+            gameOver();
+        } else {
+            resetPaddleAndBall();
+        }
+    }
+
+    /**
+     * Ham tra ve vi tri cu neu con mang
+     */
+    private void resetPaddleAndBall() {
+        double paddleStartX = (Config.SCREEN_WIDTH - Config.PADDLE_WIDTH) / 2;
+        paddle.setX(paddleStartX);
+        paddle.setY(Config.PADDLE_Y_POSITION);
+        balls.clear();
+        double ballStartX = paddle.getX() + (paddle.getWidth() / 2);
+        double ballStartY = paddle.getY() - Config.BALL_RADIUS;
+        balls.add(new Ball(ballStartX, ballStartY, Config.BALL_RADIUS));
     }
 
     private void nextLevel() {
         currentLevel++;
-        // @TODO: Kiểm tra xem có phải màn cuối không. Nếu có -> winGame()
-        loadLevel(currentLevel);
+        if (currentLevel > 5) {
+            winGame();
+        } else {
+            loadLevel(currentLevel);
+        }
     }
 
     private void gameOver() {
         isRunning = false;
         gameLoop.stop();
         soundManager.stopBackgroundMusic();
-        // @TODO: Gọi màn hình GameOver.fxml của Huy
-        System.out.println("GAME OVER");
+        SceneManager.goToGameOver(stage);
     }
 
     private void winGame() {
         isRunning = false;
         gameLoop.stop();
-        // @TODO: Gọi màn hình WinScreen.fxml của Huy
-        System.out.println("YOU WIN!");
+        soundManager.stopBackgroundMusic();
+        SceneManager.goToWinScreen(stage);
     }
 }

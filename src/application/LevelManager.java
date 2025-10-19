@@ -3,7 +3,6 @@ package application;
 import gameobject.Brick; // @TODO: Import từ package của Khánh
 import level.*; // Import các màn chơi của bạn
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class LevelManager {
