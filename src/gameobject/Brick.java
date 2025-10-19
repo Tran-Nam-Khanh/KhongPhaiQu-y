@@ -34,7 +34,6 @@ public abstract class Brick extends GameObject {
         if (destroyed) {
             return;
         }
-
         hitPoints--;
         if (hitPoints <= 0) {
             destroy(gamePane);
@@ -50,9 +49,7 @@ public abstract class Brick extends GameObject {
     }
 
     public boolean isDestroyed() {
-
         return destroyed;
-
     }
 
     public ImageView getImageView() {
@@ -60,7 +57,8 @@ public abstract class Brick extends GameObject {
     }
     public boolean isUnbreakable() {
         return false;
-    } //dinh danh xem co phai gach pha duoc ko
+    }
+    //dinh danh xem co phai gach pha duoc ko
 
 
     @Override
