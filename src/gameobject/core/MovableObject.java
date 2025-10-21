@@ -1,4 +1,4 @@
-package gameobject;
+package gameobject.core;
 
 import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
@@ -31,9 +31,11 @@ public abstract class MovableObject extends GameObject {
     }
 
     // --- Cập nhật vị trí theo vận tốc ---
-    public void update() {
-        x += dx;
-        y += dy;
+    @Override
+    public void update(double deltaTime) {
+        // SỬA: Dùng setX/setY để cập nhật cả ImageView (nếu có)
+        setX(getX() + dx * deltaTime);
+        setY(getY() + dy * deltaTime);
     }
 
     // --- Vẽ vật thể ---
@@ -46,7 +48,7 @@ public abstract class MovableObject extends GameObject {
         }
     }
 
-    // --- Xử lý va chạm với biên (tường, đáy, v.v.) ---
+    // --- Xử lý va chạm với biên ---
     public void checkBounds(double minX, double minY, double maxX, double maxY) {
         if (x < minX) {
             x = minX;
