@@ -1,5 +1,7 @@
 package gameobject;
 
+import gameobject.core.PowerUp;
+import gameobject.dynamic.Paddle;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 

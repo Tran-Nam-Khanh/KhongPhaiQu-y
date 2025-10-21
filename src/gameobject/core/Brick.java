@@ -1,4 +1,4 @@
-package gameobject;
+package gameobject.core;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -63,7 +63,7 @@ public abstract class Brick extends GameObject {
     } //dinh danh xem co phai gach pha duoc ko
 
 
-    @Override
+
     public void update() {
         // Gạch không di chuyển
     }

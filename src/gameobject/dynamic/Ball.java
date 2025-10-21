@@ -1,5 +1,6 @@
-package gameobject;
+package gameobject.dynamic;
 
+import gameobject.core.Brick;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.image.Image;
@@ -9,27 +10,30 @@ import javafx.util.Duration;
 
 import java.util.List;
 
-//QUAN LY CHUYEN DONG
-public class Ball extends MovableObject {
+public class Ball {
+    private ImageView imageView;
+    private double x, y;
+    private double width, height;
+    private double dx, dy;
+    private final double BALL_SPEED = 5;
 
-    private final double BALL_SPEED = 5; // tốc độ bóng
-    private double dx = BALL_SPEED;      // hướng ngang
-    private double dy = -BALL_SPEED;     // hướng dọc (âm = đi lên)
-    private double sceneWidth;
-    private double sceneHeight;
+    private double sceneWidth, sceneHeight;
     private Timeline timeline;
 
     public Ball(Pane gameRoot, double startX, double startY, double sceneWidth, double sceneHeight) {
-        super(gameRoot, startX, startY, 0, 0);
         this.sceneWidth = sceneWidth;
         this.sceneHeight = sceneHeight;
 
-        // Tải hình ảnh bóng
+        // Load ảnh
         Image image = new Image(getClass().getResourceAsStream("/resources/images/ball/Ball1.png"));
         imageView = new ImageView(image);
-
         width = image.getWidth();
         height = image.getHeight();
+
+        x = startX;
+        y = startY;
+        dx = BALL_SPEED;
+        dy = -BALL_SPEED;
 
         imageView.setLayoutX(x);
         imageView.setLayoutY(y);
@@ -38,71 +42,68 @@ public class Ball extends MovableObject {
         startMoving();
     }
 
-   //BAT DAU
+    // --- Getter để check va chạm ---
+    public ImageView getImageView() {
+        return imageView;
+    }
+
+    public double getX() { return x; }
+    public double getY() { return y; }
+    public double getWidth() { return width; }
+    public double getHeight() { return height; }
+
+    public void setX(double x) { this.x = x; updatePosition(); }
+    public void setY(double y) { this.y = y; updatePosition(); }
+
+    // --- Cập nhật ImageView ---
+    private void updatePosition() {
+        imageView.setLayoutX(x);
+        imageView.setLayoutY(y);
+    }
+
+    // --- Di chuyển bóng ---
     private void startMoving() {
         timeline = new Timeline(new KeyFrame(Duration.millis(16), e -> update()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
 
-//CAP NHAT VI TRI BONG
-    @Override
-    public void update() {
+    private void update() {
         x += dx;
         y += dy;
         updatePosition();
 
-        // Va chạm biên trái/phải
-        if (x <= 0 || x + width >= sceneWidth) {
-            dx *= -1;
-        }
+        // Va chạm biên
+        if (x <= 0 || x + width >= sceneWidth) dx *= -1;
+        if (y <= 0) dy *= -1;
 
-        // Va chạm trần
-        if (y <= 0) {
-            dy *= -1;
-        }
-
-        // Nếu rơi ra khỏi màn hình -> reset
-        if (y > sceneHeight) {
-            resetBall();
-        }
+        // Nếu rơi ra ngoài màn hình
+        if (y > sceneHeight) resetBall();
     }
 
-
-    @Override
-    public void updatePosition() {
-        imageView.setLayoutX(x);
-        imageView.setLayoutY(y);
-    }
-
-
+    // --- Va chạm với paddle ---
     public void checkPaddleCollision(Paddle paddle) {
         if (imageView.getBoundsInParent().intersects(paddle.getImageView().getBoundsInParent())) {
             dy = -Math.abs(dy); // bật lên
-
-            // Thay đổi góc phản xạ dựa vào vị trí chạm trên paddle
             double hitPos = (x + width / 2) - (paddle.getX() + paddle.getWidth() / 2);
             dx = hitPos * 0.1;
         }
     }
 
-
-    public void checkBrickCollision(List<Brick> bricks, Pane gameRoot) {
+    // --- Va chạm với gạch ---
+    public void checkBrickCollision(List<? extends Brick> bricks, Pane gameRoot) {
         for (Brick brick : bricks) {
             if (imageView.getBoundsInParent().intersects(brick.getImageView().getBoundsInParent())) {
-
-                // Nếu là gạch không thể phá
-                if (brick instanceof UnbreakableBrick) {
+                if (brick.isUnbreakable()) {
                     bounceFromBrick(brick);
                 } else {
                     brick.hit(gameRoot);
                     bounceFromBrick(brick);
                 }
-                break; // chỉ xử lý 1 viên gạch tại 1 khung hình
+                break; // chỉ xử lý 1 viên gạch 1 frame
             }
         }
     }
-
 
     private void bounceFromBrick(Brick brick) {
         double ballCenterX = x + width / 2;
@@ -113,17 +114,10 @@ public class Ball extends MovableObject {
         double dxDiff = ballCenterX - brickCenterX;
         double dyDiff = ballCenterY - brickCenterY;
 
-        // Xác định hướng bật: ngang hay dọc
-        if (Math.abs(dxDiff) > Math.abs(dyDiff)) {
-            dx *= -1; // bật ngang
-        } else {
-            dy *= -1; // bật dọc
-        }
+        if (Math.abs(dxDiff) > Math.abs(dyDiff)) dx *= -1;
+        else dy *= -1;
     }
 
-    /**
-     * Đặt lại bóng về giữa màn hình khi rơi xuống
-     */
     private void resetBall() {
         x = sceneWidth / 2 - width / 2;
         y = sceneHeight / 2 - height / 2;
@@ -131,4 +125,6 @@ public class Ball extends MovableObject {
         dy = -BALL_SPEED;
         updatePosition();
     }
+
+
 }

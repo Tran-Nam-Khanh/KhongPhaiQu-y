@@ -1,17 +1,28 @@
-package gameobject;
+package gameobject.core;
 
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 
+/**
+ * Lớp cơ sở cho mọi vật thể trong game (gạch, bóng, paddle, item, v.v.)
+ * Cung cấp vị trí, kích thước, hình ảnh và khung va chạm cơ bản.
+ */
 public abstract class GameObject {
 
-    protected double x; //toa do x
-    protected double y;  //toa do y
-    protected double width;
-    protected double height; //chieu dai va chieu rong cua vat the
-    protected Image image; //luu hinh anh
+    protected double x;       // Tọa độ X
+    protected double y;       // Tọa độ Y
+    protected double width;   // Chiều rộng
+    protected double height;  // Chiều cao
+    protected Image image;
+    protected ImageView imageView;// Ảnh đại diện của vật thể
+
+    // ======== CONSTRUCTOR ========
+    public GameObject(double x, double y, double width, double height) {
+        this(x, y, width, height, null);
+    }
 
     public GameObject(double x, double y, double width, double height, Image image) {
         this.x = x;
@@ -42,6 +53,9 @@ public abstract class GameObject {
     public double getWidth() {
         return width;
     }
+    public ImageView getImageView() {
+        return imageView;
+    }
 
     public void setWidth(double width) {
         this.width = width;
@@ -65,20 +79,20 @@ public abstract class GameObject {
 
     // ======== HÀM CHUNG ========
 
-    //Ve vat the
+    /** Vẽ vật thể lên màn hình (nếu có ảnh) */
     public void draw(GraphicsContext gc) {
         if (image != null) {
             gc.drawImage(image, x, y, width, height);
         }
     }
 
-    /** Trả về khung va chạm (dùng để kiểm tra collision) */
+    /** Trả về khung va chạm (collision bounds) */
     public Rectangle2D getBounds() {
         return new Rectangle2D(x, y, width, height);
     }
 
-    /** Hàm cập nhật mỗi frame (nếu object có chuyển động, override trong class con) */
+    /** Hàm cập nhật mỗi frame (override trong class con nếu cần) */
     public void update(double deltaTime) {
-        // Mặc định: không làm gì cả
+        // Mặc định không làm gì
     }
 }

@@ -1,5 +1,6 @@
-package gameobject;
+package gameobject.bricks;
 
+import gameobject.core.Brick;
 import javafx.scene.layout.Pane;
 
 /**
@@ -28,3 +29,4 @@ public class UnbreakableBrick extends Brick {
     public boolean isUnbreakable() { //ham dinh danh loai gach (da them vao trong Brick)
         return true;
     }
+}

@@ -1,5 +1,7 @@
 package gameobject;
 
+import gameobject.core.PowerUp;
+import gameobject.dynamic.Paddle;
 import javafx.scene.layout.Pane;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
@@ -12,8 +14,9 @@ public class ExpandPaddleItem extends PowerUp {
     private static final double EXPAND_RATIO = 1.5; // Paddle dài ra 1.5 lần
     private static final double DURATION = 5;       // Thời gian hiệu ứng (giây)
 
-    public ExpandPaddleItem(Pane gameRoot, double x, double y) {
-        super(gameRoot, x, y, "/resources/images/items/expand_paddle.png");
+    // SỬA CONSTRUCTOR - đúng tham số
+    public ExpandPaddleItem(Pane gameRoot, Paddle paddle, double x, double y) {
+        super(gameRoot, paddle, x, y, "/resources/images/items/Item3.png");
     }
 
     @Override
