@@ -1,73 +1,73 @@
 package application;
 
-import com.KhongPhaiQuy.Arkanoid.ui.GameUIController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 
 public class SceneManager {
 
-    private static final String UI_RESOURCE_PATH = "/com/KhongPhaiQuy/Arkanoid/ui/";
+    private static SceneManager instance;
+    private Stage primaryStage;
 
-    public static void goToMainMenu(Stage stage) {
+    // Private constructor để ngăn việc tạo instance từ bên ngoài
+    private SceneManager() {}
+
+    // Phương thức để lấy instance duy nhất của lớp (Singleton Pattern)
+    public static synchronized SceneManager getInstance() {
+        if (instance == null) {
+            instance = new SceneManager();
+        }
+        return instance;
+    }
+
+    public void setPrimaryStage(Stage stage) {
+        this.primaryStage = stage;
+    }
+
+    // Tải một file FXML và trả về root node của nó
+    private Parent loadFXML(String fxmlFile) throws IOException {
+        // Đường dẫn tới file FXML, giả sử chúng nằm trong /resources/ui/
+        String fxmlPath = "/ui/" + fxmlFile;
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+        return loader.load();
+    }
+
+    // Hiển thị một Scene mới
+    private void showScene(Parent root) {
+        Scene scene = new Scene(root, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
+        primaryStage.setScene(scene);
+    }
+
+    public void showMainMenu() {
         try {
-            Parent root = FXMLLoader.load(SceneManager.class.getResource(UI_RESOURCE_PATH + "MainMenu.fxml"));
-            stage.setScene(new Scene(root, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT));
+            Parent root = loadFXML("main-menu.fxml"); // Tên file FXML của bạn
+            showScene(root);
         } catch (IOException e) {
-            System.err.println("Fail to load MainMenu.fxml");
+            System.err.println("Không thể tải màn hình Main Menu!");
             e.printStackTrace();
         }
     }
 
-    public static void goToGameOver(Stage stage) {
+    public void showGameScreen() {
         try {
-            Parent root = FXMLLoader.load(SceneManager.class.getResource(UI_RESOURCE_PATH + "GameOver.fxml"));
-            stage.setScene(new Scene(root, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT));
+            Parent root = loadFXML("game-ui.fxml"); // Tên file FXML của bạn
+            showScene(root);
+            // Yêu cầu focus để nhận sự kiện bàn phím
+            root.requestFocus();
         } catch (IOException e) {
-            System.err.println("Fail to load GameOver.fxml");
+            System.err.println("Không thể tải màn hình Game!");
             e.printStackTrace();
         }
     }
 
-    public static void goToWinScreen(Stage stage) {
+    public void showGameOverScreen() {
         try {
-            Parent root = FXMLLoader.load(SceneManager.class.getResource(UI_RESOURCE_PATH + "WinScreen.fxml"));
-            stage.setScene(new Scene(root, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT));
+            Parent root = loadFXML("game-over.fxml"); // Tên file FXML của bạn
+            showScene(root);
         } catch (IOException e) {
-            System.err.println("Fail to load WinScreen.fxml");
-            e.printStackTrace();
-        }
-    }
-
-    public static void startGame(Stage stage) {
-        try {
-            Canvas canvas = new Canvas(Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
-            GraphicsContext gc = canvas.getGraphicsContext2D();
-
-            FXMLLoader uiLoader = new FXMLLoader(SceneManager.class.getResource(UI_RESOURCE_PATH + "GameUI.fxml"));
-            AnchorPane gameUIPane = uiLoader.load();
-            GameUIController gameUIController = uiLoader.getController();
-
-            StackPane root = new StackPane();
-            root.getChildren().addAll(canvas, gameUIPane);
-
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-
-            scene.setCursor(javafx.scene.Cursor.NONE);
-
-            GameManager gameManager = new GameManager(stage, gc, gameUIController);
-            gameManager.startGame(scene);
-
-        } catch (IOException e) {
-            System.err.println("Fail to load game!");
+            System.err.println("Không thể tải màn hình Game Over!");
             e.printStackTrace();
         }
     }

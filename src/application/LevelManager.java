@@ -1,33 +1,56 @@
 package application;
 
-import gameobject.Brick; // @TODO: Import từ package của Khánh
-import level.*; // Import các màn chơi của bạn
-
+import gameobject.core.Brick;
+// Giả sử bạn có lớp BrickMapLoader trong package level
+import level.BrickMapLoader;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LevelManager {
-    private BrickMapLoader brickMapLoader;
 
-    public LevelManager() {
-        this.brickMapLoader = new BrickMapLoader();
+    private static LevelManager instance;
+    private int currentLevelNumber;
+
+    private LevelManager() {}
+
+    public static synchronized LevelManager getInstance() {
+        if (instance == null) {
+            instance = new LevelManager();
+        }
+        return instance;
     }
 
-    public List<Brick> loadLevel(int levelNumber) {
-        Level currentLevel;
-        switch (levelNumber) {
-            case 1:
-                currentLevel = new Level1();
-                break;
-            case 2:
-                currentLevel = new Level2();
-                break;
-            // @TODO: Thêm các case cho Level3, Level4, Boss
-            default:
-                // Màn chơi mặc định hoặc xử lý khi hết màn
-                currentLevel = new Level1();
+    public void loadLevel(int levelNumber) {
+        this.currentLevelNumber = levelNumber;
+        GameManager gameManager = GameManager.getInstance();
+
+        // Xóa các đối tượng cũ trước khi tải level mới
+        gameManager.clearGameObjects();
+
+        // Giả sử BrickMapLoader.load trả về một List<Brick>
+        List<Brick> bricks = BrickMapLoader.load(levelNumber);
+
+        // Thêm tất cả gạch vào GameManager
+        for (Brick brick : bricks) {
+            gameManager.addGameObject(brick);
         }
 
-        // Dùng BrickMapLoader để chuyển layout từ mảng số nguyên thành danh sách đối tượng Brick
-        return brickMapLoader.createBrickList(currentLevel.getBrickLayout());
+        // Tạo và thêm paddle, ball vào màn chơi
+        // gameManager.addGameObject(new Paddle());
+        // gameManager.addGameObject(new Ball());
+
+        System.out.println("Đã tải thành công Level " + levelNumber);
+    }
+
+    public boolean isLevelComplete() {
+        // Level hoàn thành khi không còn viên gạch nào có thể bị phá hủy
+        // Giả sử UnbreakableBrick có một phương thức để kiểm tra
+        return GameManager.getInstance().getGameObjects().stream()
+                .filter(obj -> obj instanceof Brick)
+                .noneMatch(brick -> ((Brick) brick).isBreakable());
+    }
+
+    public int getCurrentLevelNumber() {
+        return currentLevelNumber;
     }
 }
