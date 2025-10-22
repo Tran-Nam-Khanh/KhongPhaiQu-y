@@ -8,17 +8,16 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            // Khởi tạo SceneManager với cửa sổ chính (Stage)
             SceneManager sceneManager = SceneManager.getInstance();
+
             sceneManager.setPrimaryStage(primaryStage);
 
-            // Đặt tiêu đề và cấu hình cửa sổ
-            primaryStage.setTitle("Arkanoid");
+            primaryStage.setTitle(Config.GAME_TITLE);
             primaryStage.setResizable(false);
 
-            // Hiển thị màn hình menu chính đầu tiên
-            sceneManager.showMainMenu();
-            primarystage.show();
+            sceneManager.showMainMenuScene();
+
+            primaryStage.show();
 
         } catch (Exception e) {
             e.printStackTrace();

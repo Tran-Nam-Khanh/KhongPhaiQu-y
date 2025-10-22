@@ -1,45 +1,37 @@
 package application;
 
-import com.KhongPhaiQu-y.Arkanoid.ui.StoryDialogController;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.io.IOException;
-
+/**
+ * Lớp Singleton để quản lý các yếu tố cốt truyện, như hội thoại hoặc cắt cảnh.
+ */
 public class StoryManager {
 
-    /**
-     * Hiển thị một hộp thoại cốt truyện.
-     * @param ownerStage Cửa sổ chính của game, để hộp thoại mới hiện lên trên.
-     * @param npcImagePath Đường dẫn tới ảnh nhân vật NPC.
-     * @param dialogueText Lời thoại cần hiển thị.
-     */
-    public static void showStoryDialog(Stage ownerStage, String npcImagePath, String dialogueText) {
-        try {
-            FXMLLoader loader = new FXMLLoader(StoryManager.class.getResource("/com/KhongPhaiQuy/Arkanoid/ui/StoryDialog.fxml"));
-            AnchorPane page = loader.load();
+    private static StoryManager instance;
+    private final Map<Integer, String> levelStartDialogues;
 
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle("Story");
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(ownerStage);
-            dialogStage.initStyle(StageStyle.UNDECORATED);
-            Scene scene = new Scene(page);
-            dialogStage.setScene(scene);
+    private StoryManager() {
+        levelStartDialogues = new HashMap<>();
+        // Tải trước một số đoạn hội thoại ví dụ
+        levelStartDialogues.put(1, "Màn 1: Sự khởi đầu!");
+        levelStartDialogues.put(2, "Chúng đang mạnh hơn!");
+        levelStartDialogues.put(4, "Thử thách cuối cùng!");
+    }
 
-            StoryDialogController controller = loader.getController();
-            Image npcImage = new Image(StoryManager.class.getResourceAsStream(npcImagePath));
-            controller.showDialogue(npcImage, dialogueText, () -> dialogStage.close()); // Truyền hành động đóng cửa sổ vào
+    public static synchronized StoryManager getInstance() {
+        if (instance == null) {
+            instance = new StoryManager();
+        }
+        return instance;
+    }
 
-            dialogStage.showAndWait();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void showStoryForLevel(int levelNumber) {
+        String dialogue = levelStartDialogues.get(levelNumber);
+        if (dialogue != null) {
+            // Trong một game thực tế, bạn sẽ hiển thị điều này trong một thành phần giao diện người dùng.
+            // in ra console.
+            System.out.println("CỐT TRUYỆN: " + dialogue);
         }
     }
 }

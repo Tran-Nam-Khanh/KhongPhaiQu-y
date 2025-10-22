@@ -47,13 +47,27 @@ public class Ball {
         return imageView;
     }
 
-    public double getX() { return x; }
-    public double getY() { return y; }
-    public double getWidth() { return width; }
-    public double getHeight() { return height; }
+    public double getX() {
+        return x;
+    }
+    public double getY() {
+        return y;
+    }
+    public double getWidth() {
+        return width;
+    }
+    public double getHeight() {
+        return height;
+    }
 
-    public void setX(double x) { this.x = x; updatePosition(); }
-    public void setY(double y) { this.y = y; updatePosition(); }
+    public void setX(double x) {
+        this.x = x;
+        updatePosition();
+    }
+    public void setY(double y) {
+        this.y = y;
+        updatePosition();
+    }
 
     // --- Cập nhật ImageView ---
     private void updatePosition() {
@@ -126,5 +140,14 @@ public class Ball {
         updatePosition();
     }
 
+    public void setPosition(double centerX, double centerY) {
+        this.x = centerX - Config.BALL_RADIUS; // Tọa độ x của hình tròn là góc trái trên
+        this.y = centerY - Config.BALL_RADIUS; // Tọa độ y của hình tròn là góc trái trên
+    }
 
+    public void resetVelocity() {
+        this.speedX = Config.BALL_INITIAL_SPEED_X;
+        // Dùng Math.abs để đảm bảo tốc độ Y luôn là số âm (bay lên trên)
+        this.speedY = -Math.abs(Config.BALL_INITIAL_SPEED_Y);
+    }
 }
