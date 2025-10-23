@@ -7,15 +7,19 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
+import application.Config;
+import gameobject.core.MovableObject;
 
 import java.util.List;
 
-public class Ball {
+public class Ball extends MovableObject {
     private ImageView imageView;
     private double x, y;
     private double width, height;
     private double dx, dy;
     private final double BALL_SPEED = 5;
+    private double speedX;
+    private double speedY;
 
     private double sceneWidth, sceneHeight;
     private Timeline timeline;
@@ -60,6 +64,22 @@ public class Ball {
         return height;
     }
 
+    public double getSpeedX() {
+        return speedX;
+    }
+
+    public void setSpeedX(double speedX) {
+        this.speedX = speedX;
+    }
+
+    public double getSpeedY() {
+        return speedY;
+    }
+
+    public void setSpeedY(double speedY) {
+        this.speedY = speedY;
+    }
+
     public void setX(double x) {
         this.x = x;
         updatePosition();
@@ -80,6 +100,14 @@ public class Ball {
         timeline = new Timeline(new KeyFrame(Duration.millis(16), e -> update()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
+    }
+
+    public void reverseSpeedY() {
+        this.speedY = -this.speedY;
+    }
+
+    public void reverseSpeedX() {
+        this.speedX = -this.speedX;
     }
 
     private void update() {

@@ -14,6 +14,7 @@ public class GameManager {
     private static GameManager instance;
     private Boss boss;
     private Pane gameRoot;
+    final double deltaTime = 1.0;
 
     public enum GameState {
         MENU, PLAYING, PAUSED, GAME_OVER, LEVEL_TRANSITION, BOSS_FIGHT
@@ -45,17 +46,20 @@ public class GameManager {
 
     public void update() {
         if (currentState == GameState.PLAYING) {
-            new ArrayList<>(gameObjects).forEach(GameObject::update);
+
+            for (GameObject obj : new ArrayList<>(gameObjects)) {
+                obj.update(deltaTime);
+            }
 
             if (isLevelComplete()) {
                 LevelManager.getInstance().progressToNextStage();
             }
         }
         else if (currentState == GameState.BOSS_FIGHT) {
-            // Cập nhật tất cả các đối tượng (boss, bóng, thanh đỡ)
-            new ArrayList<>(gameObjects).forEach(GameObject::update);
+            for (GameObject obj : new ArrayList<>(gameObjects)) {
+                obj.update(deltaTime);
+            }
 
-            // Tìm quả bóng và kiểm tra va chạm với boss
             Ball ball = findBall();
             if (ball != null && boss != null && boss.isAlive()) {
                 if (boss.checkBallCollision(ball)) {
@@ -64,7 +68,6 @@ public class GameManager {
                 }
             }
 
-            //Kiểm tra xem boss đã bị đánh bại chưa
             if (boss != null && !boss.isAlive()) {
                 setCurrentState(GameState.GAME_OVER);
                 SceneManager.getInstance().showWinScreen();
@@ -72,10 +75,6 @@ public class GameManager {
         }
     }
 
-    public void showWinScreen() {
-        System.out.println("Winner");
-        switchScene("WinScreen.fxml");
-    }
 
     /**
      * Phương thức trợ giúp để tìm đối tượng Ball trong danh sách gameObjects.

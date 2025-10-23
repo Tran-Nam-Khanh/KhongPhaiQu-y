@@ -76,6 +76,9 @@ public class BrickMapLoader {
                     case 'U':
                         brick = new UnbreakableBrick(brickX, brickY, BRICK_WIDTH, BRICK_HEIGHT);
                         break;
+                    case 'B':
+                        brick = new BlockBrick(brickX, brickY, BRICK_WIDTH, BRICK_HEIGHT);
+                        break;
                 }
 
                 if (brick != null) {
